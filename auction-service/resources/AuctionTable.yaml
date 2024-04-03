@@ -1,0 +1,43 @@
+# 定义一个名为 AuctionsTable 的 DynamoDB 表
+AuctionsTable:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    # 使用变量设置表名，将环境名称添加到表名后缀，以便在不同环境中创建不同的表
+    TableName: AuctionsTable-${self:provider.stage}
+    # 定义表的属性
+    AttributeDefinitions:
+      # 定义 id 属性，类型为字符串
+      - AttributeName: id
+        AttributeType: S
+      # 定义 status 属性，类型为字符串
+      - AttributeName: status
+        AttributeType: S
+      # 定义 endingAt 属性，类型为字符串
+      - AttributeName: endingAt
+        AttributeType: S
+    # 定义主键
+    KeySchema:
+      # 设置 id 作为主键的 HASH 键
+      - AttributeName: id
+        KeyType: HASH
+    # 定义全局二级索引
+    GlobalSecondaryIndexes:
+      # 定义名为 statusAndEndingAt 的全局二级索引
+      - IndexName: statusAndEndDate
+        # 设置 status 为 HASH 键，endingAt 为 RANGE 键
+        KeySchema:
+          - AttributeName: status
+            KeyType: HASH
+          - AttributeName: endingAt
+            KeyType: RANGE
+        # 投影类型设置为 ALL，表示索引包含所有属性
+        Projection:
+          ProjectionType: ALL
+        # 设置预配吞吐量为 1 读取容量单位和 1 写入容量单位
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    # 定义表的预配吞吐量
+    ProvisionedThroughput:
+      ReadCapacityUnits: 1
+      WriteCapacityUnits: 1

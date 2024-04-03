@@ -1,0 +1,14 @@
+AuctionsTableIAM:
+  Effect: Allow
+  Action:
+    - dynamodb:*
+  Resource: 
+    - ${self:custom.AuctionsTable.arn}
+    # - ${self:custom.AuctionsTable.arn}/index/statusAndEndDate
+    # 下面的join不要和auction table的GlobalSecondaryIndexes一同deploy创建，否则会报错
+    - !Join
+      - '/'
+      - - ${self:custom.AuctionsTable.arn}
+        - index
+        - statusAndEndDate
+

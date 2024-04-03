@@ -1,0 +1,40 @@
+org: monnagg
+app: notification-service
+service: notification-service
+frameworkVersion: '3'
+
+plugins:
+  - serverless-bundle
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-2
+  memorySize: 256
+  stage: ${opt:stage, 'dev'}
+  iamRoleStatements:
+    - ${file(iam/sendMailIAM.yaml):sendMailIAM}
+
+resources:
+  Resources:
+    MailQueue: ${file(resources/MailQueue.yaml):MailQueue}
+  Outputs:
+    MailQueueArn: ${file(resources/MailQueue.yaml):Outputs.MailQueueArn}
+    MailQueueUrl: ${file(resources/MailQueue.yaml):Outputs.MailQueueUrl}
+    
+    
+ 
+functions:
+  sendMail:
+    handler: src/handlers/sendMail.handler
+    events:
+      - sqs:
+          arn: ${self:custom.MailQueue.arn}
+          batchSize: 1
+
+custom:
+  MailQueue:
+    name: MailQueue-${self:provider.stage}
+    arn: !GetAtt MailQueue.Arn
+    url: !Ref MailQueue
+    linting: false

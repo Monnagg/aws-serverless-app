@@ -1,0 +1,87 @@
+org: monnagg
+app: auction-service
+service: auction-service
+frameworkVersion: "3"
+
+plugins:
+  - serverless-bundle
+  #- serverless-pseudo-parameters
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: ${opt:stage, 'dev'}
+  # 设置 AWS 区域为 us-east-2
+  region: us-east-2
+  # 设置函数的内存大小为 256MB
+  memorySize: 256
+  environment:
+    # 定义环境变量
+    AUCTIONS_TABLE_NAME: ${self:custom.AuctionsTable.name}
+    MAIL_QUEUE_URL: ${self:custom.MailQueue.url}
+
+  iamRoleStatements:
+    - ${file(iam/AuctionsTableIAM.yaml):AuctionsTableIAM}
+    - ${file(iam/MailQueueIAM.yaml):MailQueueIAM}
+
+resources:
+  Resources:
+    AuctionsTable: ${file(resources/AuctionTable.yaml):AuctionsTable}
+
+# 函数配置
+functions:
+  # 定义一个名为 createAuction 的函数
+  createAuction:
+    # 指定函数处理程序为 src/handlers/createAuction.handler
+    handler: src/handlers/createAuction.handler
+    # 定义函数的触发事件，这里是 HTTP 请求
+    events:
+      # 当收到 GET 请求时触发
+      - http:
+          method: POST
+          # 请求路径为 /auction
+          path: /auction
+          authorizer: ${self:custom.authorizer}
+
+
+  getAuctions:
+    handler: src/handlers/getAuctions.handler
+    events:
+      - http:
+         method: GET
+         path: /auctions
+         authorizer: ${self:custom.authorizer}
+
+  getAuction:
+    handler: src/handlers/getAuction.handler
+    events:
+      - http:
+         method: GET
+         path: /auction/{id}
+         authorizer: ${self:custom.authorizer}
+  placeBid:
+    handler: src/handlers/placeBid.handler
+    events:
+      - http:
+         method: PATCH
+         path: /auction/{id}/bid
+         authorizer: ${self:custom.authorizer}
+  # 下面是一个定时触发器配置，用于每分钟触发 processAuctions Lambda 函数。
+  processAuctions:
+    handler: src/handlers/processAuctions.handler
+    events:
+      - schedule: rate(1 minute)
+
+custom:
+  # authorizer: arn:aws:lambda:us-east-2:152743476034:function:auth-service-dev-auth
+  authorizer: arn:aws:lambda:${self:provider.region}:${aws:accountId}:function:auth-service-${self:provider.stage}-auth
+
+  AuctionsTable:
+    name: !Ref AuctionsTable
+    arn: !GetAtt AuctionsTable.Arn
+  MailQueue:
+    # importing the (exported) MailQueue outputs from cloud formation
+    arn: ${cf:notification-service-${self:provider.stage}.MailQueueArn}
+    url: ${cf:notification-service-${self:provider.stage}.MailQueueUrl}
+  bundle:
+    linting: false
