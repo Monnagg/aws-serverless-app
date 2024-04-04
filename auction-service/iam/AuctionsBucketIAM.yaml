@@ -1,0 +1,10 @@
+AuctionsBucketIAM:
+  
+  # # Allow functions to read/write objects in a bucket
+  Effect: Allow
+  Action:
+    - 's3:*'
+    # - 's3:PutObject'
+    # - 's3:PutBucketPolicy'
+  Resource: arn:aws:s3:::${self:custom.AuctionsBucket.name}/*
+

@@ -1,0 +1,34 @@
+AuctionsBucket:
+  Type: AWS::S3::Bucket
+  Properties:
+    BucketName: ${self:custom.AuctionsBucket.name}
+    LifecycleConfiguration:
+      Rules:
+        - Id: ExpirePictures
+          Status: Enabled
+          ExpirationInDays: 1
+
+
+# 定义用于 AuctionsBucket 的存储桶策略
+AuctionsBucketPolicy:
+  Type: AWS::S3::BucketPolicy
+  Properties:
+    # 引用 AuctionsBucket 资源
+    Bucket: !Ref AuctionsBucket
+    # 定义策略文档
+    PolicyDocument:
+      Version: "2012-10-17"
+      # 在策略中定义一个声明
+      Statement:
+        # 声明的标识符
+        - Sid: PublicRead
+          # 声明的生效效果（允许/拒绝）
+          Effect: Allow
+          # 允许执行操作的主体
+          Principal: '*'
+          # 声明允许的操作
+          Action:
+            - 's3:*'
+           
+          # 该声明适用的资源
+          Resource: arn:aws:s3:::${self:custom.AuctionsBucket.name}/*
