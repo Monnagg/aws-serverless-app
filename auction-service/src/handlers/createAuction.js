@@ -18,6 +18,7 @@ async function createAuction(event, context) {
   // 获取当前时间
   const now = new Date();
   const endDate = new Date();
+  const { email } = event.requestContext.authorizer;
   endDate.setHours(now.getHours() + 1); // 设置拍卖品结束时间为当前时间加 1 小时
   // 构建拍卖品对象
   const auction = {
@@ -29,6 +30,7 @@ async function createAuction(event, context) {
     highestBid: { // 设置最高出价
       amount: 0,
     },
+    seller: email,
   };
 
   try {
