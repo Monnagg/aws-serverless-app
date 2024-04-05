@@ -46,6 +46,7 @@ functions:
           # 请求路径为 /auction
           path: /auction
           authorizer: ${self:custom.authorizer}
+          cors: true
 
 
   getAuctions:
@@ -55,6 +56,8 @@ functions:
          method: GET
          path: /auctions
          authorizer: ${self:custom.authorizer}
+         cors: true
+
 
   getAuction:
     handler: src/handlers/getAuction.handler
@@ -63,6 +66,8 @@ functions:
          method: GET
          path: /auction/{id}
          authorizer: ${self:custom.authorizer}
+         cors: true
+
   placeBid:
     handler: src/handlers/placeBid.handler
     events:
@@ -70,6 +75,7 @@ functions:
          method: PATCH
          path: /auction/{id}/bid
          authorizer: ${self:custom.authorizer}
+         cors: true
 
   uploadAuctionPicture:
     handler: src/handlers/uploadAuctionPicture.handler
@@ -78,6 +84,7 @@ functions:
           method: PATCH
           path: auction/{id}/picture
           authorizer: ${self:custom.authorizer}
+          cors: true
 
   # 下面是一个定时触发器配置，用于每分钟触发 processAuctions Lambda 函数。
   processAuctions:
