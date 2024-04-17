@@ -44,5 +44,5 @@ export async function uploadAuctionPicture(event){
 
 export const handler = middy(uploadAuctionPicture)
     .use(httpErrorHandler())
-    .use(validator({ eventSchema: transpileSchema(uploadAuctionPictureSchema) }))
+    //.use(validator({ eventSchema: transpileSchema(uploadAuctionPictureSchema) }))
     .use(cors());

@@ -89,8 +89,8 @@ functions:
   # 下面是一个定时触发器配置，用于每分钟触发 processAuctions Lambda 函数。
   processAuctions:
     handler: src/handlers/processAuctions.handler
-    events:
-      - schedule: rate(1 minute)
+    # events:
+    #   - schedule: rate(1 minute)
 
 custom:
   # authorizer: arn:aws:lambda:us-east-2:152743476034:function:auth-service-dev-auth

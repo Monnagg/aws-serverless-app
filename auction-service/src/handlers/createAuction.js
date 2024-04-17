@@ -19,7 +19,7 @@ async function createAuction(event, context) {
   const now = new Date();
   const endDate = new Date();
   const { email } = event.requestContext.authorizer;
-  endDate.setHours(now.getHours() + 1); // 设置拍卖品结束时间为当前时间加 1 小时
+  endDate.setHours(now.getDate() + 12 ); // 设置拍卖品结束时间为当前时间加 1 小时
   // 构建拍卖品对象
   const auction = {
     id: uuid(), // 使用 uuid 生成器生成唯一标识符
